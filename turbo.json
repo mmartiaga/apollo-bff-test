@@ -1,0 +1,38 @@
+{
+  "$schema": "https://turborepo.com/schema.json",
+  "ui": "tui",
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "outputs": [".next/**", "!.next/cache/**"]
+    },
+    "lint": {
+      "dependsOn": ["^lint"]
+    },
+    "check-types": {
+      "dependsOn": ["^check-types"]
+    },
+    "@apollo-bff-test/products#dev": {
+      "persistent": true
+    },
+    "@apollo-bff-test/content#dev": {
+      "persistent": true
+    },
+    "@apollo-bff-test/gateway#dev": {
+      "with": [
+        "@apollo-bff-test/products#dev",
+        "@apollo-bff-test/content#dev"
+      ],
+      "persistent": true
+    },
+    "generate-schema": {
+      "cache": false,
+      "persistent": false
+    },
+    "publish-schema": {
+      "cache": false,
+      "persistent": false
+    }
+  }
+}
