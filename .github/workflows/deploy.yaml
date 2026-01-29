@@ -107,8 +107,6 @@ jobs:
         build-gateway,
         smoke-products,
         smoke-content,
-        smoke-orders,
-        smoke-customers,
       ]
     if: needs.detect-changes.outputs.gateway == 'true'
     uses: ./.github/workflows/_deploy-render.yaml
