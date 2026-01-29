@@ -1,5 +1,5 @@
 {
-  "name": "@gfed-medusa-bff/jest-config",
+  "name": "@apollo-bff-test/jest-config",
   "private": true,
   "version": "0.0.0",
   "exports": {

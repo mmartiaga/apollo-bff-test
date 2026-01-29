@@ -42,13 +42,13 @@ importers:
         specifier: ^2.12.6
         version: 2.12.6(graphql@16.12.0)
     devDependencies:
-      '@gfed-medusa-bff/eslint-config':
+      '@apollo-bff-test/eslint-config':
         specifier: workspace:*
         version: link:../../packages/config/eslint-config
-      '@gfed-medusa-bff/prettier-config':
+      '@apollo-bff-test/prettier-config':
         specifier: workspace:*
         version: link:../../packages/config/prettier-config
-      '@gfed-medusa-bff/typescript-config':
+      '@apollo-bff-test/typescript-config':
         specifier: workspace:*
         version: link:../../packages/config/typescript-config
       '@types/cors':
@@ -109,16 +109,16 @@ importers:
         specifier: ^2.12.6
         version: 2.12.6(graphql@16.12.0)
     devDependencies:
-      '@gfed-medusa-bff/eslint-config':
+      '@apollo-bff-test/eslint-config':
         specifier: workspace:*
         version: link:../../../packages/config/eslint-config
-      '@gfed-medusa-bff/jest-config':
+      '@apollo-bff-test/jest-config':
         specifier: workspace:*
         version: link:../../../packages/config/jest-config
-      '@gfed-medusa-bff/prettier-config':
+      '@apollo-bff-test/prettier-config':
         specifier: workspace:*
         version: link:../../../packages/config/prettier-config
-      '@gfed-medusa-bff/typescript-config':
+      '@apollo-bff-test/typescript-config':
         specifier: workspace:*
         version: link:../../../packages/config/typescript-config
       '@graphql-codegen/cli':
@@ -224,16 +224,16 @@ importers:
         specifier: ^1.24.2
         version: 1.25.0(graphql@16.12.0)
     devDependencies:
-      '@gfed-medusa-bff/eslint-config':
+      '@apollo-bff-test/eslint-config':
         specifier: workspace:*
         version: link:../../../packages/config/eslint-config
-      '@gfed-medusa-bff/jest-config':
+      '@apollo-bff-test/jest-config':
         specifier: workspace:*
         version: link:../../../packages/config/jest-config
-      '@gfed-medusa-bff/prettier-config':
+      '@apollo-bff-test/prettier-config':
         specifier: workspace:*
         version: link:../../../packages/config/prettier-config
-      '@gfed-medusa-bff/typescript-config':
+      '@apollo-bff-test/typescript-config':
         specifier: workspace:*
         version: link:../../../packages/config/typescript-config
       '@graphql-codegen/cli':

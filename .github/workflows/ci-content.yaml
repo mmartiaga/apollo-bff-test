@@ -1,0 +1,148 @@
+name: CI - Content
+
+on:
+  pull_request:
+    paths:
+      - "apps/subgraphs/content/**"
+      - "packages/**"
+      - "turbo.json"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
+      - "package.json"
+      - ".github/workflows/**"
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  verify:
+    name: Verify content
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.0.0
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint --filter=@apollo-bff-test/content
+
+      - name: Type check
+        run: pnpm check-types --filter=@apollo-bff-test/content
+
+      - name: Build
+        run: pnpm build --filter=@apollo-bff-test/content
+
+      - name: Generate SDL
+        working-directory: apps/subgraphs/content
+        run: pnpm tsx src/scripts/print-schema.ts
+
+      - name: Upload schema artifact
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: content-schema
+          path: apps/subgraphs/content/schema.graphql
+          if-no-files-found: error
+
+  build-preview-image:
+    name: Build preview image
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    needs: verify
+    uses: ./.github/workflows/_build-docker.yaml
+    permissions:
+      contents: read
+      packages: write
+    with:
+      app: content
+      dockerfile: ./apps/subgraphs/content/Dockerfile
+
+  render-preview:
+    name: Render image preview
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    needs: build-preview-image
+    uses: ./.github/workflows/_deploy-render-preview.yaml
+    with:
+      environment_name: content-smoke
+      image: ${{ needs.build-preview-image.outputs.image_tag }}
+    secrets:
+      RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+      RENDER_SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}
+
+  post-preview:
+    name: Post render preview
+    if: github.event.pull_request.head.repo.full_name == github.repository && always()
+    needs: render-preview
+    uses: ./.github/workflows/_post-render-preview.yaml
+    permissions:
+      actions: write
+      contents: read
+      pull-requests: write
+    with:
+      app_label: Content
+      app_slug: content
+      preview_url: ${{ needs.render-preview.outputs.preview_url }}
+      preview_service_id: ${{ needs.render-preview.outputs.preview_service_id }}
+      render_result: ${{ needs.render-preview.result }}
+      pr_number: ${{ github.event.pull_request.number }}
+
+  publish-schema:
+    name: Publish Content Schema
+    runs-on: ubuntu-latest
+    needs: verify
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+
+    steps:
+      - name: Download schema artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: content-schema
+          path: .
+
+      - name: Publish to schema registry
+        env:
+          SCHEMA_REGISTRY_TOKEN: ${{ secrets.SCHEMA_REGISTRY_TOKEN }}
+        run: |
+          set -euo pipefail
+          SHA=${GITHUB_SHA::7}
+
+          git clone https://x-access-token:${SCHEMA_REGISTRY_TOKEN}@github.com/mmartiaga/apollo-bff-test-schema-registry.git
+
+          mkdir -p apollo-bff-test-schema-registry/subgraphs/content
+          cp schema.graphql apollo-bff-test-schema-registry/subgraphs/content/$SHA.graphql
+          cp schema.graphql apollo-bff-test-schema-registry/subgraphs/content/latest.graphql
+
+          cd apollo-bff-test-schema-registry
+          git config user.name "schema-bot"
+          git config user.email "schema-bot@goodfrontend.dev"
+          git add subgraphs/content
+
+          if git diff --cached --quiet; then
+            echo "Schema unchanged, skipping publish."
+            exit 0
+          fi
+
+          git commit -m "chore(schema): content @$SHA"
+          git push

@@ -1,0 +1,120 @@
+name: Deploy to Render
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  deployments: write
+  packages: write
+
+jobs:
+  detect-changes:
+    name: Detect changes
+    runs-on: ubuntu-latest
+    outputs:
+      gateway: ${{ steps.changes.outputs.gateway }}
+      products: ${{ steps.changes.outputs.products }}
+      content: ${{ steps.changes.outputs.content }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - id: changes
+        uses: dorny/paths-filter@v3
+        with:
+          base: ${{ github.event.before || 'HEAD^' }}
+          filters: |
+            gateway:
+              - 'apps/gateway/**'
+              - 'packages/**'
+              - 'turbo.json'
+              - 'pnpm-lock.yaml'
+              - 'render.yaml'
+            products:
+              - 'apps/subgraphs/products/**'
+              - 'packages/**'
+              - 'turbo.json'
+              - 'pnpm-lock.yaml'
+              - 'render.yaml'
+            content:
+              - 'apps/subgraphs/content/**'
+              - 'packages/**'
+              - 'turbo.json'
+              - 'pnpm-lock.yaml'
+              - 'render.yaml'
+
+  build-gateway:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.gateway == 'true'
+    uses: ./.github/workflows/_build-docker.yaml
+    with:
+      app: gateway
+      dockerfile: ./apps/gateway/Dockerfile
+
+  build-products:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.products == 'true'
+    uses: ./.github/workflows/_build-docker.yaml
+    with:
+      app: products
+      dockerfile: ./apps/subgraphs/products/Dockerfile
+
+  build-content:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.content == 'true'
+    uses: ./.github/workflows/_build-docker.yaml
+    with:
+      app: content
+      dockerfile: ./apps/subgraphs/content/Dockerfile
+
+  smoke-products:
+    needs: [detect-changes, build-products]
+    if: needs.detect-changes.outputs.products == 'true'
+    uses: ./.github/workflows/_deploy-render.yaml
+    with:
+      app: products-smoke
+      image: ${{ needs.build-products.outputs.image_tag }}
+      publish_schema: true
+      subgraph_name: products
+    secrets:
+      RENDER_API_KEY: ${{ secrets.RENDER_API_KEY}}
+      APOLLO_KEY: ${{ secrets.APOLLO_KEY }}
+      APOLLO_GRAPH_REF: ${{ secrets.APOLLO_GRAPH_REF }}
+      APOLLO_ROUTING_URL: ${{ secrets.APOLLO_ROUTING_URL }}
+
+  smoke-content:
+    needs: [detect-changes, build-content]
+    if: needs.detect-changes.outputs.content == 'true'
+    uses: ./.github/workflows/_deploy-render.yaml
+    with:
+      app: content-smoke
+      image: ${{ needs.build-content.outputs.image_tag }}
+      publish_schema: true
+      subgraph_name: content
+    secrets:
+      RENDER_API_KEY: ${{ secrets.RENDER_API_KEY}}
+      APOLLO_KEY: ${{ secrets.APOLLO_KEY }}
+      APOLLO_GRAPH_REF: ${{ secrets.APOLLO_GRAPH_REF }}
+      APOLLO_ROUTING_URL: ${{ secrets.APOLLO_ROUTING_URL }}
+
+  smoke-gateway:
+    needs:
+      [
+        detect-changes,
+        build-gateway,
+        smoke-products,
+        smoke-content,
+        smoke-orders,
+        smoke-customers,
+      ]
+    if: needs.detect-changes.outputs.gateway == 'true'
+    uses: ./.github/workflows/_deploy-render.yaml
+    with:
+      app: gateway-smoke
+      image: ${{ needs.build-gateway.outputs.image_tag }}
+    secrets:
+      RENDER_API_KEY: ${{ secrets.RENDER_API_KEY}}
+

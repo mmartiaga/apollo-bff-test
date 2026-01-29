@@ -35,10 +35,10 @@
     "graphql-tag": "^2.12.6"
   },
   "devDependencies": {
-    "@gfed-medusa-bff/eslint-config": "workspace:*",
-    "@gfed-medusa-bff/jest-config": "workspace:*",
-    "@gfed-medusa-bff/prettier-config": "workspace:*",
-    "@gfed-medusa-bff/typescript-config": "workspace:*",
+    "@apollo-bff-test/eslint-config": "workspace:*",
+    "@apollo-bff-test/jest-config": "workspace:*",
+    "@apollo-bff-test/prettier-config": "workspace:*",
+    "@apollo-bff-test/typescript-config": "workspace:*",
     "@graphql-codegen/cli": "^6.0.0",
     "@graphql-codegen/typescript": "^5.0.0",
     "@graphql-codegen/typescript-resolvers": "^5.1.0",

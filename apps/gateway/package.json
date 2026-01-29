@@ -18,9 +18,9 @@
     "graphql-tag": "^2.12.6"
   },
   "devDependencies": {
-    "@gfed-medusa-bff/eslint-config": "workspace:*",
-    "@gfed-medusa-bff/prettier-config": "workspace:*",
-    "@gfed-medusa-bff/typescript-config": "workspace:*",
+    "@apollo-bff-test/eslint-config": "workspace:*",
+    "@apollo-bff-test/prettier-config": "workspace:*",
+    "@apollo-bff-test/typescript-config": "workspace:*",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "dotenv-cli": "^11.0.0",

@@ -1,5 +1,5 @@
 {
-  "name": "@gfed-medusa-bff/eslint-config",
+  "name": "@apollo-bff-test/eslint-config",
   "version": "0.0.0",
   "type": "module",
   "private": true,
