@@ -107,46 +107,46 @@ jobs:
       pr_number: ${{ github.event.pull_request.number }}
 
     publish-schema:
-    name: Publish Content Schema
-    runs-on: ubuntu-latest
-    needs: verify
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    permissions:
-      contents: read
+      name: Publish Content Schema
+      runs-on: ubuntu-latest
+      needs: verify
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      permissions:
+        contents: read
 
-    steps:
-      - name: Download schema artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: content-schema
-          path: .
+      steps:
+        - name: Download schema artifact
+          uses: actions/download-artifact@v4
+          with:
+            name: content-schema
+            path: .
 
-      - name: Checkout schema registry repo
-        uses: actions/checkout@v4
-        with:
-          repository: mmartiaga/apollo-bff-test-schema-registry
-          token: ${{ secrets.SCHEMA_REGISTRY_TOKEN }}
-          path: apollo-bff-test-schema-registry
-          fetch-depth: 0
+        - name: Checkout schema registry repo
+          uses: actions/checkout@v4
+          with:
+            repository: mmartiaga/apollo-bff-test-schema-registry
+            token: ${{ secrets.SCHEMA_REGISTRY_TOKEN }}
+            path: apollo-bff-test-schema-registry
+            fetch-depth: 0
 
-      - name: Publish to schema registry
-        run: |
-          set -euo pipefail
-          SHA=${GITHUB_SHA::7}
+        - name: Publish to schema registry
+          run: |
+            set -euo pipefail
+            SHA=${GITHUB_SHA::7}
 
-          mkdir -p apollo-bff-test-schema-registry/subgraphs/content
-          cp schema.graphql apollo-bff-test-schema-registry/subgraphs/content/$SHA.graphql
-          cp schema.graphql apollo-bff-test-schema-registry/subgraphs/content/latest.graphql
+            mkdir -p apollo-bff-test-schema-registry/subgraphs/content
+            cp schema.graphql apollo-bff-test-schema-registry/subgraphs/content/$SHA.graphql
+            cp schema.graphql apollo-bff-test-schema-registry/subgraphs/content/latest.graphql
 
-          cd apollo-bff-test-schema-registry
-          git config user.name "schema-bot"
-          git config user.email "schema-bot@goodfrontend.dev"
-          git add subgraphs/content
+            cd apollo-bff-test-schema-registry
+            git config user.name "schema-bot"
+            git config user.email "schema-bot@goodfrontend.dev"
+            git add subgraphs/content
 
-          if git diff --cached --quiet; then
-            echo "Schema unchanged, skipping publish."
-            exit 0
-          fi
+            if git diff --cached --quiet; then
+              echo "Schema unchanged, skipping publish."
+              exit 0
+            fi
 
-          git commit -m "chore(schema): content @$SHA"
-          git push
+            git commit -m "chore(schema): content @$SHA"
+            git push
