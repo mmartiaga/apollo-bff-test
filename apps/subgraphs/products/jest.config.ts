@@ -1,6 +1,6 @@
 import type { Config } from 'jest';
 
-import jestConfig from '@gfed-medusa-bff/jest-config/base';
+import jestConfig from '@apollo-bff-test/jest-config/base';
 
 const config: Config = {
   ...jestConfig,

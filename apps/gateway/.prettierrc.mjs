@@ -1,4 +1,4 @@
-import prettierBaseConfig from '@gfed-medusa-bff/prettier-config/base';
+import prettierBaseConfig from '@apollo-bff-test/prettier-config/base';
 
 export default {
   ...prettierBaseConfig,
