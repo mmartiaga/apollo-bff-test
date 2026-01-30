@@ -106,7 +106,7 @@ jobs:
       render_result: ${{ needs.render-preview.result }}
       pr_number: ${{ github.event.pull_request.number }}
 
-  publish-schema:
+    publish-schema:
     name: Publish Content Schema
     runs-on: ubuntu-latest
     needs: verify
@@ -121,14 +121,18 @@ jobs:
           name: content-schema
           path: .
 
+      - name: Checkout schema registry repo
+        uses: actions/checkout@v4
+        with:
+          repository: mmartiaga/apollo-bff-test-schema-registry
+          token: ${{ secrets.SCHEMA_REGISTRY_TOKEN }}
+          path: apollo-bff-test-schema-registry
+          fetch-depth: 0
+
       - name: Publish to schema registry
-        env:
-          SCHEMA_REGISTRY_TOKEN: ${{ secrets.SCHEMA_REGISTRY_TOKEN }}
         run: |
           set -euo pipefail
           SHA=${GITHUB_SHA::7}
-
-          git clone https://x-access-token:${SCHEMA_REGISTRY_TOKEN}@github.com/mmartiaga/apollo-bff-test-schema-registry.git
 
           mkdir -p apollo-bff-test-schema-registry/subgraphs/content
           cp schema.graphql apollo-bff-test-schema-registry/subgraphs/content/$SHA.graphql
