@@ -203,15 +203,17 @@ export type ResolversParentTypes = {
   String: Scalars['String']['output'];
 };
 
-export interface DateTimeScalarConfig
-  extends GraphQLScalarTypeConfig<ResolversTypes['DateTime'], any> {
+export interface DateTimeScalarConfig extends GraphQLScalarTypeConfig<
+  ResolversTypes['DateTime'],
+  any
+> {
   name: 'DateTime';
 }
 
 export type FooterResolvers<
   ContextType = any,
-  ParentType extends
-    ResolversParentTypes['Footer'] = ResolversParentTypes['Footer'],
+  ParentType extends ResolversParentTypes['Footer'] =
+    ResolversParentTypes['Footer'],
 > = {
   _id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   _type?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -237,31 +239,33 @@ export type FooterResolvers<
   >;
 };
 
-export interface JsonScalarConfig
-  extends GraphQLScalarTypeConfig<ResolversTypes['JSON'], any> {
+export interface JsonScalarConfig extends GraphQLScalarTypeConfig<
+  ResolversTypes['JSON'],
+  any
+> {
   name: 'JSON';
 }
 
 export type PartialRichTextResolvers<
   ContextType = any,
-  ParentType extends
-    ResolversParentTypes['PartialRichText'] = ResolversParentTypes['PartialRichText'],
+  ParentType extends ResolversParentTypes['PartialRichText'] =
+    ResolversParentTypes['PartialRichText'],
 > = {
   text?: Resolver<Maybe<ResolversTypes['JSON']>, ParentType, ContextType>;
 };
 
 export type QueryResolvers<
   ContextType = any,
-  ParentType extends
-    ResolversParentTypes['Query'] = ResolversParentTypes['Query'],
+  ParentType extends ResolversParentTypes['Query'] =
+    ResolversParentTypes['Query'],
 > = {
   footer?: Resolver<Maybe<ResolversTypes['Footer']>, ParentType, ContextType>;
 };
 
 export type SocialLinkResolvers<
   ContextType = any,
-  ParentType extends
-    ResolversParentTypes['SocialLink'] = ResolversParentTypes['SocialLink'],
+  ParentType extends ResolversParentTypes['SocialLink'] =
+    ResolversParentTypes['SocialLink'],
 > = {
   text?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   url?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
