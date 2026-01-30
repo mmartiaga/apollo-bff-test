@@ -158,5 +158,5 @@ jobs:
           fi
 
           git commit -m "chore(schema): products @$SHA"
-
+          git rebase origin/main
           git push -u origin main
