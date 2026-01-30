@@ -111,9 +111,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: verify
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    environment: products-smoke
     permissions:
       contents: read
-    environment: products-smoke
+
     steps:
       - name: Download schema artifact
         uses: actions/download-artifact@v4
@@ -121,18 +122,26 @@ jobs:
           name: products-schema
           path: .
 
-      - name: Checkout schema registry repo
-        uses: actions/checkout@v4
-        with:
-          repository: mmartiaga/apollo-bff-test-schema-registry
-          token: ${{ secrets.SCHEMA_REGISTRY_TOKEN }}
-          path: apollo-bff-test-schema-registry
-          fetch-depth: 0
-
       - name: Publish to schema registry
+        env:
+          SCHEMA_REGISTRY_TOKEN: ${{ secrets.SCHEMA_REGISTRY_TOKEN }}
         run: |
           set -euo pipefail
           SHA=${GITHUB_SHA::7}
+          REPO="mmartiaga/apollo-bff-test-schema-registry"
+          URL="https://x-access-token:${SCHEMA_REGISTRY_TOKEN}@github.com/${REPO}.git"
+
+          if git clone --depth 1 --branch main "$URL" apollo-bff-test-schema-registry 2>/dev/null; then
+            echo "Cloned existing registry repo (main)."
+          else
+            echo "Registry repo appears empty or main doesn't exist. Bootstrapping..."
+            mkdir -p apollo-bff-test-schema-registry
+            cd apollo-bff-test-schema-registry
+            git init
+            git checkout -b main
+            git remote add origin "$URL"
+            cd ..
+          fi
 
           mkdir -p apollo-bff-test-schema-registry/subgraphs/products
           cp schema.graphql apollo-bff-test-schema-registry/subgraphs/products/$SHA.graphql
@@ -149,4 +158,5 @@ jobs:
           fi
 
           git commit -m "chore(schema): products @$SHA"
-          git push
+
+          git push -u origin main
