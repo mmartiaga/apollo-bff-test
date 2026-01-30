@@ -13,7 +13,8 @@ projects:
             region: oregon
             autoDeployTrigger: off
             image:
-              url: ghcr.io/mmartiaga/apollo-bff-test/gateway:latest
+              # url: ghcr.io/mmartiaga/apollo-bff-test/gateway:latest
+              url: traefik/whoami:v1.11
             envVars:
               - fromGroup: bff-smoke-env-group
 
@@ -24,7 +25,8 @@ projects:
             region: oregon
             autoDeployTrigger: off
             image:
-              url: ghcr.io/mmartiaga/apollo-bff-test/content:latest
+              # url: ghcr.io/mmartiaga/apollo-bff-test/content:latest
+              url: traefik/whoami:v1.11
             envVars:
               - fromGroup: bff-smoke-env-group
 
@@ -35,7 +37,8 @@ projects:
             region: oregon
             autoDeployTrigger: off
             image:
-              url: ghcr.io/mmartiaga/apollo-bff-test/products:latest
+              # url: ghcr.io/mmartiaga/apollo-bff-test/products:latest
+              url: traefik/whoami:v1.11
             envVars:
               - fromGroup: bff-smoke-env-group
 
