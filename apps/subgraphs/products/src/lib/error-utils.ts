@@ -5,7 +5,7 @@ import {
   ValidationError,
 } from '../types/errors';
 
-// TODO: delete `lib` folder. we should be using `lib` from `@gfed-medusa/bff-lib-common` once its ready
+// TODO: delete `lib` folder. we should be using `lib` from `@apollo-bff-test/bff-lib-common` once its ready
 export function handleMedusaError(
   error: unknown,
   operation: string,

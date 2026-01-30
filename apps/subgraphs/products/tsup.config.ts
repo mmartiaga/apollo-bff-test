@@ -8,5 +8,5 @@ export default defineConfig({
   sourcemap: false,
   target: 'es2022',
   treeshake: true,
-  noExternal: [/^@gfed-medusa\//],
+  noExternal: [/^@apollo-bff-test\//],
 });
